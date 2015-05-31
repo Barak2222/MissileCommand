@@ -2,9 +2,10 @@ var settings = {
     FPS: 30,
     CW: 1920, // canvas width
     CH: 979, // canvas height
-    speed: 4,
+    speed: 3,
+    isResizedScreen: true,
 }
-settings.SZ= (settings.CW+settings.CH)/2,
+
 settings.setWindowSize = function() {
   if (typeof (window.innerWidth) == 'number') {
     myWidth = window.innerWidth;
@@ -20,11 +21,11 @@ settings.setWindowSize = function() {
       }
     }
   }
-  console.log(myWidth, myHeight);
   settings.CW = myWidth;
   settings.CH = myHeight;
 }
 settings.setWindowSize();
+var gDATA = getGameDATA();
 
 var helpers = {
   distance: function(a,b){
@@ -37,18 +38,34 @@ var helpers = {
   }
 }
 
-var canvasElement = $("<canvas id='canvas' width='" + settings.CW +  "' height='" + settings.CH + "'></canvas>");
+var canvasElement = $("<canvas id='canvas'></canvas>'")
+.attr({
+  'width': settings.CW,
+  'height': settings.CH
+})
+.appendTo('#gameBoard');
+
 var ctx = canvasElement.get(0).getContext("2d");
-canvasElement.appendTo('#gameBoard');
 
-/*
 window.addEventListener('resize', function(){
-  setWindowSize();
-  canvasElement.attr('width', settings.CW)
-  .attr('height', settings.CH);
-
+  settings.isResizedScreen = true;
 });
-*/
+
+settings.applyResponsiveness = function(){
+  this.setWindowSize();
+
+  canvasElement.attr({
+    'width': settings.CW,
+    'height': settings.CH
+  });
+
+  gDATA = getGameDATA();
+  this.isResizedScreen = false;
+}
+
+  // Make PlayerMissile inherit from Missile {TODO} check this out
+  //PlayerMissile.prototype = Object.create( Missile.prototype );
+  //PlayerMissile.prototype.constructor = PlayerMissile;
 
 $(document).ready(function(){
   $('#gameBoard').on('click', 'canvas', function(e){
