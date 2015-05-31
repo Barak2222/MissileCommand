@@ -22,11 +22,14 @@ var game = {
             if(this.display=='titles'){
                 if(gDATA.userClick.newClick){
                     gDATA.userClick.newClick = false;
-                    if(!this.lost){
-                        level.incoming = 10 + game.level;
-                        level.maxRockets++;
-                    }
                     level.init();
+                    if(this.lost){
+                        this.score = 0;
+                        level.maxRockets = 5;
+                    } else {
+                        level.maxRockets+= 0.4;
+                    }
+                    level.incoming = Math.min( 10 + game.level, 30);
                     this.display = 'action';
                     this.lost = false;
                 }
@@ -157,7 +160,6 @@ var level = {
         game.bases = [];
         game.rockets = [];
         game.explosions = [];
-        this.maxRockets = 5;
         this.incoming = 10;
         this.enemyRockets = [];
         this.villages = [];
@@ -188,12 +190,12 @@ var level = {
         this.villages = helpers.tryToDestroy(this.villages);
         game.bases = helpers.tryToDestroy(game.bases);
 
-        if(this.incoming>0 && this.enemyRockets.length<this.maxRockets){
+        if(this.incoming>0 && this.enemyRockets.length<Math.floor(this.maxRockets)){
             this.launchEnemyRocket();
         }
     },
     launchEnemyRocket: function(){
-        if(Math.random()<0.05){
+        if(Math.random() < 0.01 + (game.level/100+0.01)/2){
             var p = Math.floor(Math.random()*settings.CW);
             var targetA = Math.floor(Math.random()*(this.villages.length));
             var targetB = Math.floor(Math.random()*(game.bases.length));
@@ -252,7 +254,7 @@ function Rocket(origin, target){
     this.launchY = origin.y;
     this.destination = target;
     if(origin.y < settings.CH*0.82){
-        this.speed = settings.speed*(1-Math.random()/4);
+        this.speed = (game.level+14)/15 * settings.speed*(1-Math.random()/4);
     } else {
         this.speed = settings.speed*12;
     }
